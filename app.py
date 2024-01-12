@@ -20,6 +20,7 @@ def load_user(user_id):
 
 
 @app.route('/dashboard', methods=['GET','POST'])
+@login_required
 def dashborad():
     books = Book.query.all()
     return render_template('dashboard.html',books = books)
@@ -35,8 +36,16 @@ def login():
         if user := User.query.filter_by(username=username, password=password).first():
             login_user(user)
             return redirect(url_for('dashborad'))
+        else:
+            flash(f"Enter the currect username or Password.",category="danger")
         
     return render_template('login.html')
+
+@app.route('/logout',methods=['GET',"POST"])
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET','POST'])
 def registration():

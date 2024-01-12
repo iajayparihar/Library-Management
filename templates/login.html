@@ -18,14 +18,10 @@ login
           <span class="h1 fw-bold mb-0">ThoughtWin Library</span>
         </div>
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
-                {% set category = 'success' %}
-                {% if 'error' in message %}
-                    {% set category = 'danger' %}
-                {% endif %}
-                <div id="flash-message" class="alert alert-{{ category }}" role="alert">
+            {% for category,message in messages %}
+            <div id="flash-message" class="alert alert-{{ category }}" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
