@@ -21,9 +21,21 @@ def load_user(user_id):
 
 @app.route('/dashboard', methods=['GET','POST'])
 @login_required
-def dashborad():
+def dashboard():
     books = Book.query.all()
-    return render_template('dashboard.html',books = books)
+    borrow = Borrow.query.all()
+    return render_template('dashboard.html', books = books, borrow = borrow )
+
+
+@app.route('/borrow/<int:user_id>/<int:book_id>')
+@login_required
+def borrow(user_id,book_id):
+    user = User.query.get(user_id) 
+    book = Book.query.get(book_id)
+    if (user or book) is None:
+        flash(f'some error occur sorry!','danger')
+    flash(f'Successfully borrowed !!','success')
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -35,7 +47,7 @@ def login():
             # walrus operator :=
         if user := User.query.filter_by(username=username, password=password).first():
             login_user(user)
-            return redirect(url_for('dashborad'))
+            return redirect(url_for('dashboard'))
         else:
             flash(f"Enter the currect username or Password.",category="danger")
         

@@ -55,7 +55,11 @@ class Borrow(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False)
     book_id = db.Column(db.Integer,db.ForeignKey('book.id'), nullable = False)
     borrow_date = db.Column(db.Date, default=date.today() ,unique = False , nullable = False)
-    return_date = db.Column(db.Date)
+    return_date = db.Column(db.Date,nullable = False )
+
+    def __init__(self,user_id,book_id):
+        self.user_id = user_id
+        self.book_id = book_id
 
     def __repr__(self):
         return f"user_id : {self.user_id}, book_id: {self.book_id}"

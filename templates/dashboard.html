@@ -53,7 +53,19 @@ Library Management Dashboard
             <h1 class="mb-4">Library Management</h1>
             <h1>Welcome to the Dashboard, {{ current_user.username }}🤗</h1>
         </div>
-        <div class="offset-5 col-md-1">
+        <div class="col-md-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category,message in messages %}
+                <div id="flash-message" class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                
+        </div>
+        <div class=" col-md-2">
             <a href="{{url_for('logout')}}" class="btn btn-danger">Logout</a>
         </div>
 
@@ -69,9 +81,9 @@ Library Management Dashboard
                     <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
                     <p class="card-text description">{{ book.description }}</p>
                 </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm borrow-btn">Borrow</button>
-                    <button class="btn btn-sm wishlist-btn">Wishlist</button>
+                <div class="card-footer text-center"> 
+                    <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm borrow-btn"> Borrow </a>    
+                    <a href="#" class="btn btn-sm wishlist-btn"> Wishlist </a>
                 </div>
             </div>
         </div>
