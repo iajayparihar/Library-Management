@@ -26,6 +26,20 @@ def dashboard():
     borrow = Borrow.query.all()
     return render_template('dashboard.html', books = books, borrow = borrow )
 
+@app.route('/returnBook/<int:b_id>/<int:book_id>',methods=["GET","POST"])
+@login_required
+def returnBook(b_id,book_id):
+    # change in book status unAvailable to Available in book table
+    book = Book.query.get(book_id)
+    book.status = "Available"
+    
+    # in the borrow table return_date feed
+    bor = Borrow.query.get(b_id)
+    bor.return_date = date.today()
+
+    db.session.add_all([book,bor])
+    db.session.commit()
+    return redirect(url_for('dashboard'))    
 
 @app.route('/borrow/<int:user_id>/<int:book_id>')
 @login_required
@@ -34,7 +48,20 @@ def borrow(user_id,book_id):
     book = Book.query.get(book_id)
     if (user or book) is None:
         flash(f'some error occur sorry!','danger')
-    flash(f'Successfully borrowed !!','success')
+        return redirect(url_for('dashboard'))
+
+    if book.status == "Available":
+        bor = Borrow(user_id=user_id,book_id=book_id)
+        db.session.add(bor)
+        db.session.commit()
+        
+        book.status = "Unavailable"
+        db.session.add(book)
+        db.session.commit()
+        flash(f'Successfully borrowed !!','success')
+    else:
+        flash(f'Book is not Available','warning')
+
     return redirect(url_for('dashboard'))
 
 

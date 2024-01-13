@@ -1,100 +1,121 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Library Management Dashboard
+  Library Management Dashboard
 {% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
-<style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+  <style>
     .book-card {
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        margin: 10px; /* Adjust margin for spacing */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
-        height: 300px; /* Set a fixed height for square shape */
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      /* Adjust margin for spacing */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+      height: 300px;
+      /* Set a fixed height for square shape */
     }
-
+    
     .book-card:hover {
-        transform: scale(1.05);
+      transform: scale(1.05);
     }
-
+    
     .description {
-        max-height: 100px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      max-height: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
+    
     .borrow-btn {
-        color: #fff;
-        background-color: #007bff;
-        border: 1px solid #007bff;
+      color: #fff;
+      background-color: #007bff;
+      border: 1px solid #007bff;
     }
-
+    
+    .unavailable-btn {
+      color: #fff;
+      background-color: rgba(255, 0, 0, 0.884);
+      border: 1px solid #ff0015;
+    }
+    
     .wishlist-btn {
-        color: #fff;
-        background-color: #28a745;
-        border: 1px solid #28a745;
+      color: #fff;
+      background-color: #28a745;
+      border: 1px solid #28a745;
     }
-
+    
     .borrow-btn:hover,
     .wishlist-btn:hover {
-        background-color: #0056b3;
-        border: 1px solid #0056b3;
+      background-color: #0056b3;
+      border: 1px solid #0056b3;
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+  <div class="container mt-5">
     <div class="row">
-        <div class="col-md-6">
-            <h1 class="mb-4">Library Management</h1>
-            <h1>Welcome to the Dashboard, {{ current_user.username }}🤗</h1>
-        </div>
-        <div class="col-md-4">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category,message in messages %}
-                <div id="flash-message" class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-                
-        </div>
-        <div class=" col-md-2">
-            <a href="{{url_for('logout')}}" class="btn btn-danger">Logout</a>
-        </div>
-
+      <div class="col-md-6">
+        <h1 class="mb-4">Library Management</h1>
+        <h1>Welcome to the Dashboard, {{ current_user.username }}🤗</h1>
+      </div>
+      <div class="col-md-4">
+        {% with messages = get_flashed_messages(with_categories = true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div id="flash-message" class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+      <div class="col-md-2">
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+      </div>
     </div>
 
     <!-- Book List -->
     <div class="row">
-        {% for book in books %}
+      {% for book in books %}
         <div class="col-md-4">
-            <div class="card book-card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ book.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
-                    <p class="card-text description">{{ book.description }}</p>
-                </div>
-                <div class="card-footer text-center"> 
-                    <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm borrow-btn"> Borrow </a>    
-                    <a href="#" class="btn btn-sm wishlist-btn"> Wishlist </a>
-                </div>
+          <div class="card book-card">
+            <div class="card-body">
+              <h5 class="card-title">{{ book.title }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+              <p class="card-text description">{{ book.description }}</p>
             </div>
+            <div class="card-footer text-center">
+              
+              {% if book.status == 'Available' %}
+              <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm borrow-btn">Borrow</a>
+          {% else %}
+              {% set user_has_borrowed = false %}
+              
+              {% for b in borrow if b.return_date is none %}
+                  {% if current_user.id == b.user_id and book.id == b.book_id %}
+                      {% set user_has_borrowed = true %}
+                      <a href="/returnBook/{{ b.id }}/{{ book.id }}" class="btn btn-sm unavailable-btn">Return Book</a>
+                  {% endif %}
+              {% endfor %}    
+              
+              {% if not user_has_borrowed %}
+                  <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm unavailable-btn"> Unavailable </a>
+              {% endif %}
+          {% endif %}
+          
+
+
+
+              <a href="#" class="btn btn-sm wishlist-btn">Wishlist</a>
+            </div>
+          </div>
         </div>
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
+  </div>
 {% endblock %}
 
 {% block script %}
-<!-- Bootstrap JS and Popper.js (required for Bootstrap) -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
 {% endblock %}
