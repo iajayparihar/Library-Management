@@ -87,26 +87,24 @@
             </div>
             <div class="card-footer text-center">
               
-              {% if book.status == 'Available' %}
+            {% if book.status == 'Available' %}
               <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm borrow-btn">Borrow</a>
-          {% else %}
-              {% set user_has_borrowed = false %}
+              {% else %}
               
+              {% set user_has_borrowed = false %}
+
               {% for b in borrow if b.return_date is none %}
                   {% if current_user.id == b.user_id and book.id == b.book_id %}
                       {% set user_has_borrowed = true %}
                       <a href="/returnBook/{{ b.id }}/{{ book.id }}" class="btn btn-sm unavailable-btn">Return Book</a>
                   {% endif %}
               {% endfor %}    
-              
               {% if not user_has_borrowed %}
                   <a href="/borrow/{{ current_user.id }}/{{ book.id }}" class="btn btn-sm unavailable-btn"> Unavailable </a>
               {% endif %}
+
           {% endif %}
           
-
-
-
               <a href="#" class="btn btn-sm wishlist-btn">Wishlist</a>
             </div>
           </div>

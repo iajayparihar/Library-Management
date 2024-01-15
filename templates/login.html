@@ -2,9 +2,8 @@
 {% block title %}
 login
 {% endblock title %}
-
 {% block style %}
-<link rel="stylesheet" href="login.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 {% endblock style %}
 
 {% block body %}

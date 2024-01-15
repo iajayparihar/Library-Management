@@ -2,7 +2,13 @@
 
 {% block title %}
 Register
-{% endblock %}
+{% endblock title %}
+
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='reg.css') }}">
+{% endblock style %}
+  
 
 {% block body %}
 <!-- Section: Design Block -->
